@@ -1,0 +1,651 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="biped2">
+
+<link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="0 6.93889390390723E-18 -0.00353702881964298"
+        rpy="0 0 0" />
+      <mass
+        value="0.146597733142352" />
+      <inertia
+        ixx="0.000499095243742441"
+        ixy="6.08482199537575E-21"
+        ixz="-5.06359889736004E-22"
+        iyy="0.000232960521410008"
+        iyz="-2.00308643036864E-22"
+        izz="0.000730887077870349" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://biped2_description/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://biped2_description/meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="RightHipYaw_Link">
+    <inertial>
+      <origin
+        xyz="-0.00938065191384546 -0.0202664108883804 -0.0206772913097968"
+        rpy="0 0 0" />
+      <mass
+        value="0.32400290469679" />
+      <inertia
+        ixx="0.000381782374867003"
+        ixy="-3.17561819723005E-05"
+        ixz="-8.51177367676625E-05"
+        iyy="0.00047177332808205"
+        iyz="-7.87042272940447E-05"
+        izz="0.000277023607348501" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://biped2_description/meshes/RightHipYaw_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 0.501960784313725 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://biped2_description/meshes/RightHipYaw_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RightHipYaw"
+    type="revolute">
+    <origin
+      xyz="0 0.0370000000000001 -0.0069000000000002"
+      rpy="0 0 -1.5707963267949" />
+    <parent
+      link="base_link" />
+    <child
+      link="RightHipYaw_Link" />
+    <axis
+      xyz="0 0 -1" />
+    <limit lower="-1.57" upper="1.57" effort="4" velocity="10" />
+  </joint>
+  <link
+    name="RightHipRoll_Link">
+    <inertial>
+      <origin
+        xyz="2.80878352208747E-05 8.91460233753646E-05 -0.00775282576794794"
+        rpy="0 0 0" />
+      <mass
+        value="0.349566965746669" />
+      <inertia
+        ixx="0.000391462219052249"
+        ixy="1.9597471286716E-07"
+        ixz="4.59620731436458E-07"
+        iyy="0.000334351735315859"
+        iyz="1.00909718216474E-08"
+        izz="0.000316745269621729" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://biped2_description/meshes/RightHipRoll_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://biped2_description/meshes/RightHipRoll_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RightHipRoll"
+    type="revolute">
+    <origin
+      xyz="-0.0269999999999998 -0.045 -0.0660000000000001"
+      rpy="1.5707963267949 0 0" />
+    <parent
+      link="RightHipYaw_Link" />
+    <child
+      link="RightHipRoll_Link" />
+    <axis
+      xyz="0 0 -1" />
+    <limit lower="-0.8" upper="0.8" effort="8" velocity="10" />
+  </joint>
+  <link
+    name="RightHipPitch_Link">
+    <inertial>
+      <origin
+        xyz="0.0291945751890465 -0.0344774986310344 -0.0332060534391662"
+        rpy="0 0 0" />
+      <mass
+        value="1.41958356782443" />
+      <inertia
+        ixx="0.00255572052360668"
+        ixy="0.00156174436668396"
+        ixz="1.34091855814678E-06"
+        iyy="0.00208391489558782"
+        iyz="3.44812916855061E-06"
+        izz="0.00454137308434772" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://biped2_description/meshes/RightHipPitch_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.866666666666667 0.909803921568627 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://biped2_description/meshes/RightHipPitch_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RightHipPitch"
+    type="revolute">
+    <origin
+      xyz="0.002333 0 -0.07972"
+      rpy="0 1.5708 0" />
+    <parent
+      link="RightHipRoll_Link" />
+    <child
+      link="RightHipPitch_Link" />
+    <axis
+      xyz="0 0 1" />
+    <limit lower="-1.2" upper="1.2" effort="12" velocity="10" />
+  </joint>
+  <link
+    name="RightKneePitch_Link">
+    <inertial>
+      <origin
+        xyz="-0.0634092485688111 -0.0636672279848905 6.35580236232891E-06"
+        rpy="0 0 0" />
+      <mass
+        value="0.279996510532442" />
+      <inertia
+        ixx="0.000455208731325749"
+        ixy="-0.00043118289444032"
+        ixz="9.13250238805167E-22"
+        iyy="0.000452193181517545"
+        iyz="1.77318971640608E-21"
+        izz="0.000902066029004483" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://biped2_description/meshes/RightKneePitch_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://biped2_description/meshes/RightKneePitch_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RightKneePitch"
+    type="revolute">
+    <origin
+      xyz="0.141472780326853 -0.165859737207645 -0.0356660904406152"
+      rpy="0 0 0" />
+    <parent
+      link="RightHipPitch_Link" />
+    <child
+      link="RightKneePitch_Link" />
+    <axis
+      xyz="0 0 1" />
+    <limit lower="-2.0" upper="0.1" effort="12" velocity="10" />
+  </joint>
+  <link
+    name="RightAnklePitch_Link">
+    <inertial>
+      <origin
+        xyz="0.0013086504291748 -0.0295452747949575 3.0823028396687E-05"
+        rpy="0 0 0" />
+      <mass
+        value="0.194838123296218" />
+      <inertia
+        ixx="4.01740636585254E-05"
+        ixy="-9.9790509420609E-06"
+        ixz="8.08400822351087E-20"
+        iyy="0.000175171895057929"
+        iyz="8.58223590292872E-20"
+        izz="0.000199695239483564" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://biped2_description/meshes/RightAnklePitch_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.866666666666667 0.909803921568627 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://biped2_description/meshes/RightAnklePitch_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RightAnklePitch"
+    type="revolute">
+    <origin
+      xyz="-0.12702 -0.12754 0"
+      rpy="0 0 0" />
+    <parent
+      link="RightKneePitch_Link" />
+    <child
+      link="RightAnklePitch_Link" />
+    <axis
+      xyz="0 0 1" />
+    <limit lower="-0.8" upper="0.8" effort="8" velocity="10" />
+  </joint>
+  <link
+    name="LeftHipYaw_Link">
+    <inertial>
+      <origin
+        xyz="-0.00949840029844066 0.0205190978019058 -0.0211908035734405"
+        rpy="0 0 0" />
+      <mass
+        value="0.333032495025878" />
+      <inertia
+        ixx="0.000396067811508703"
+        ixy="3.30558209284034E-05"
+        ixz="-8.85872937409606E-05"
+        iyy="0.000489716372796564"
+        iyz="8.19107565729015E-05"
+        izz="0.000286258485936791" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://biped2_description/meshes/LeftHipYaw_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 0.501960784313725 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://biped2_description/meshes/LeftHipYaw_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="LeftHipYaw"
+    type="revolute">
+    <origin
+      xyz="0 -0.037 -0.00689999999999998"
+      rpy="0 0 1.5707963267949" />
+    <parent
+      link="base_link" />
+    <child
+      link="LeftHipYaw_Link" />
+    <axis
+      xyz="0 0 -1" />
+    <limit lower="-1.57" upper="1.57" effort="4" velocity="10" />
+  </joint>
+  <link
+    name="LeftHipRoll_Link">
+    <inertial>
+      <origin
+        xyz="3.92886518660041E-05 -8.26978383578389E-05 -0.00775282552139215"
+        rpy="0 0 0" />
+      <mass
+        value="0.349566967945749" />
+      <inertia
+        ixx="0.000391509379278449"
+        ixy="-2.23390100488717E-07"
+        ixz="3.86582711229081E-07"
+        iyy="0.000334304575153112"
+        iyz="-5.25133189177374E-08"
+        izz="0.000316745269682307" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://biped2_description/meshes/LeftHipRoll_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://biped2_description/meshes/LeftHipRoll_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="LeftHipRoll"
+    type="revolute">
+    <origin
+      xyz="-0.0270000000000002 0.045 -0.0659999999999999"
+      rpy="-1.5707963267949 0 0" />
+    <parent
+      link="LeftHipYaw_Link" />
+    <child
+      link="LeftHipRoll_Link" />
+    <axis
+      xyz="0 0 -1" />
+    <limit lower="-0.8" upper="0.8" effort="8" velocity="10" />
+  </joint>
+  <link
+    name="LeftHipPitch_Link">
+    <inertial>
+      <origin
+        xyz="0.029138535536294 0.0344828995340361 -0.0332043023204922"
+        rpy="0 0 0" />
+      <mass
+        value="1.41958356768658" />
+      <inertia
+        ixx="0.00255579194622634"
+        ixy="-0.00156076454476771"
+        ixz="1.84770326799921E-06"
+        iyy="0.00208384347304443"
+        iyz="-3.42081926295877E-06"
+        izz="0.00454137308438558" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://biped2_description/meshes/LeftHipPitch_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.866666666666667 0.909803921568627 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://biped2_description/meshes/LeftHipPitch_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="LeftHipPitch"
+    type="revolute">
+    <origin
+      xyz="0.00233304522030758 0 -0.0797201496052746"
+      rpy="0 1.5707963267949 0" />
+    <parent
+      link="LeftHipRoll_Link" />
+    <child
+      link="LeftHipPitch_Link" />
+    <axis
+      xyz="0 0 1" />
+    <limit lower="-1.2" upper="1.2" effort="12" velocity="10" />
+  </joint>
+  <link
+    name="LeftKneePitch_Link">
+    <inertial>
+      <origin
+        xyz="-0.0611650151988828 0.0614138639908436 6.13085246820022E-06"
+        rpy="0 0 0" />
+      <mass
+        value="0.290269989748579" />
+      <inertia
+        ixx="0.000455809814888117"
+        ixy="0.000431180921756541"
+        ixz="1.75082448980997E-21"
+        iyy="0.000451822557047504"
+        iyz="4.74504169697321E-21"
+        izz="0.000902267691405568" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://biped2_description/meshes/LeftKneePitch_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://biped2_description/meshes/LeftKneePitch_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="LeftKneePitch"
+    type="revolute">
+    <origin
+      xyz="0.141472780326853 0.165859737207645 -0.0356660904406152"
+      rpy="0 0 0" />
+    <parent
+      link="LeftHipPitch_Link" />
+    <child
+      link="LeftKneePitch_Link" />
+    <axis
+      xyz="0 0 1" />
+    <limit lower="-2.0" upper="0.1" effort="12" velocity="10" />
+  </joint>
+  <link
+    name="LeftAnklePitch_Link">
+    <inertial>
+      <origin
+        xyz="0.00130865042917477 0.0295452747949576 3.08230283966801E-05"
+        rpy="0 0 0" />
+      <mass
+        value="0.194838123296218" />
+      <inertia
+        ixx="4.01740636585254E-05"
+        ixy="9.97905094206089E-06"
+        ixz="1.01760417459311E-19"
+        iyy="0.000175171895057929"
+        iyz="6.11019993304008E-21"
+        izz="0.000199695239483564" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://biped2_description/meshes/LeftAnklePitch_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.866666666666667 0.909803921568627 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://biped2_description/meshes/LeftAnklePitch_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="LeftAnklePitch"
+    type="revolute">
+    <origin
+      xyz="-0.127020567856446 0.127537348809781 0"
+      rpy="0 0 0" />
+    <parent
+      link="LeftKneePitch_Link" />
+    <child
+      link="LeftAnklePitch_Link" />
+    <axis
+      xyz="0 0 1" />
+    <limit lower="-0.8" upper="0.8" effort="8" velocity="10" />
+  </joint>
+
+  <gazebo reference="base_link">
+    <gravity>false</gravity>
+  </gazebo>
+
+  <!-- Standing pose: feet near ground when base_link is spawned at z=0.45 -->
+  <gazebo reference="LeftHipPitch">
+    <initialPosition>0.4</initialPosition>
+  </gazebo>
+  <gazebo reference="LeftKneePitch">
+    <initialPosition>-0.8</initialPosition>
+  </gazebo>
+  <gazebo reference="LeftAnklePitch">
+    <initialPosition>0.4</initialPosition>
+  </gazebo>
+  <gazebo reference="RightHipPitch">
+    <initialPosition>0.4</initialPosition>
+  </gazebo>
+  <gazebo reference="RightKneePitch">
+    <initialPosition>-0.8</initialPosition>
+  </gazebo>
+  <gazebo reference="RightAnklePitch">
+    <initialPosition>0.4</initialPosition>
+  </gazebo>
+
+  <gazebo>
+    <plugin name="gazebo_ros_joint_state_publisher" filename="libgazebo_ros_joint_state_publisher.so">
+      <ros>
+        <namespace>/</namespace>
+      </ros>
+      <update_rate>50</update_rate>
+    <joint_name>LeftHipYaw</joint_name>
+    <joint_name>LeftHipRoll</joint_name>
+    <joint_name>LeftHipPitch</joint_name>
+    <joint_name>LeftKneePitch</joint_name>
+    <joint_name>LeftAnklePitch</joint_name>
+    <joint_name>RightHipYaw</joint_name>
+    <joint_name>RightHipRoll</joint_name>
+    <joint_name>RightHipPitch</joint_name>
+    <joint_name>RightKneePitch</joint_name>
+    <joint_name>RightAnklePitch</joint_name>
+    </plugin>
+  </gazebo>
+
+  <gazebo>
+    <plugin name="gazebo_ros_joint_pose_trajectory" filename="libgazebo_ros_joint_pose_trajectory.so">
+      <ros>
+        <namespace>/</namespace>
+        <remapping>set_joint_trajectory:=/joint_trajectory_controller/joint_trajectory</remapping>
+      </ros>
+      <update_rate>50</update_rate>
+    </plugin>
+  </gazebo>
+
+  <gazebo reference="RightAnklePitch_Link">
+    <mu1>1.0</mu1>
+    <mu2>1.0</mu2>
+    <kp>1000000.0</kp>
+    <kd>100.0</kd>
+  </gazebo>
+  <gazebo reference="LeftAnklePitch_Link">
+    <mu1>1.0</mu1>
+    <mu2>1.0</mu2>
+    <kp>1000000.0</kp>
+    <kd>100.0</kd>
+  </gazebo>
+
+</robot>

@@ -1,0 +1,6 @@
+#!/usr/bin/env python3
+from biped2_kinematics.foot_lift_demo import main
+
+
+if __name__ == '__main__':
+    main()
