@@ -22,17 +22,34 @@ JOINT_NAMES: List[str] = [
     'RightAnklePitch',
 ]
 
+STAND_FOOT_Z = 0.28
+# Joint deltas at full lift (~12 cm foot clearance); scaled by lift_height / LIFT_REFERENCE_HEIGHT.
+LIFT_REFERENCE_HEIGHT = 0.12
+LIFT_JOINT_DELTAS: Dict[str, Dict[str, float]] = {
+    'left': {
+        'LeftHipPitch': -0.8,
+        'LeftKneePitch': -0.5,
+        'LeftAnklePitch': -0.5,
+    },
+    'right': {
+        'RightHipPitch': 0.3086,
+        'RightKneePitch': -0.773,
+        'RightAnklePitch': 0.0,
+    },
+}
+
+# Symmetric standing pose: both feet at the same height (foot_z ~= STAND_FOOT_Z).
 DEFAULT_JOINT_ANGLES: Dict[str, float] = {
-    'RightHipYaw': 0.0,
-    'RightHipRoll': 0.0,
-    'RightHipPitch': 0.4,
-    'RightKneePitch': -0.8,
-    'RightAnklePitch': 0.4,
     'LeftHipYaw': 0.0,
     'LeftHipRoll': 0.0,
-    'LeftHipPitch': 0.4,
-    'LeftKneePitch': -0.8,
+    'LeftHipPitch': 0.0155,
+    'LeftKneePitch': -0.0268,
     'LeftAnklePitch': 0.4,
+    'RightHipYaw': 0.0,
+    'RightHipRoll': 0.0,
+    'RightHipPitch': -0.0155,
+    'RightKneePitch': 0.0268,
+    'RightAnklePitch': 0.4,
 }
 
 LEG_IK_JOINTS: Dict[str, List[str]] = {
@@ -94,6 +111,29 @@ class Biped2Kinematics:
             q[self.joint_name_to_q_idx[joint_name]] = angle
         return q
 
+    def compute_symmetric_stand_configuration(self, foot_z: float = STAND_FOOT_Z) -> np.ndarray:
+        q = self.default_configuration()
+        left_pose, right_pose = self.forward_kinematics(q)
+        foot_y = 0.5 * (abs(left_pose.translation[1]) + abs(right_pose.translation[1]))
+        foot_x = 0.5 * (left_pose.translation[0] + right_pose.translation[0])
+
+        for _ in range(20):
+            for leg, y_sign in (('right', 1.0), ('left', -1.0)):
+                target = pin.SE3(np.eye(3), np.array([foot_x, y_sign * foot_y, foot_z]))
+                q, _, _ = self.inverse_kinematics(
+                    leg,
+                    target,
+                    q,
+                    position_only=True,
+                )
+        return q
+
+    def apply_lift_joint_deltas(self, q: np.ndarray, leg: str, scale: float) -> np.ndarray:
+        q_lift = q.copy()
+        for joint_name, delta in LIFT_JOINT_DELTAS[leg].items():
+            q_lift[self.joint_name_to_q_idx[joint_name]] += delta * scale
+        return self._clip_configuration(q_lift)
+
     def configuration_from_joint_dict(self, joint_positions: Dict[str, float]) -> np.ndarray:
         q = self.default_configuration()
         for joint_name, angle in joint_positions.items():
@@ -144,9 +184,10 @@ class Biped2Kinematics:
         target_pose: pin.SE3,
         q_init: np.ndarray,
         active_joint_names: Iterable[str] | None = None,
-        max_iter: int = 80,
-        tol: float = 1e-4,
-        damping: float = 1e-4,
+        max_iter: int = 120,
+        tol: float = 5e-4,
+        damping: float = 1e-3,
+        position_only: bool = False,
     ) -> Tuple[np.ndarray, bool, float]:
         active_joint_names = list(active_joint_names or LEG_IK_JOINTS[leg])
         active_q_indices = [self.joint_name_to_q_idx[name] for name in active_joint_names]
@@ -161,11 +202,6 @@ class Biped2Kinematics:
             pin.forwardKinematics(self.model, self.data, q)
             pin.updateFramePlacements(self.model, self.data)
             current_pose = self.data.oMf[foot_frame_id]
-            error = pin.log6(current_pose.inverse() * target_pose).vector
-            final_error = float(np.linalg.norm(error))
-            if final_error < tol:
-                success = True
-                break
 
             jacobian = pin.computeFrameJacobian(
                 self.model,
@@ -175,7 +211,20 @@ class Biped2Kinematics:
                 pin.LOCAL_WORLD_ALIGNED,
             )
             jacobian_reduced = jacobian[:, active_v_indices]
-            hessian = jacobian_reduced @ jacobian_reduced.T + damping * np.eye(6)
+
+            if position_only:
+                error = target_pose.translation - current_pose.translation
+                jacobian_reduced = jacobian_reduced[:3, :]
+                hessian = jacobian_reduced @ jacobian_reduced.T + damping * np.eye(3)
+            else:
+                error = pin.log6(current_pose.inverse() * target_pose).vector
+                hessian = jacobian_reduced @ jacobian_reduced.T + damping * np.eye(6)
+
+            final_error = float(np.linalg.norm(error))
+            if final_error < tol:
+                success = True
+                break
+
             delta_q_reduced = jacobian_reduced.T @ np.linalg.solve(hessian, error)
 
             for idx_q, delta in zip(active_q_indices, delta_q_reduced):

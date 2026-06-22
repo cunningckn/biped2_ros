@@ -1,6 +1,9 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="biped2">
 
+  <!-- Anchor base_link in mid-air for leg-swing demo -->
+  <link name="world"/>
+
 <link
     name="base_link">
     <inertial>
@@ -582,25 +585,58 @@
     <limit lower="-0.8" upper="0.8" effort="8" velocity="10" />
   </joint>
 
+  <joint name="world_to_base_fixed" type="fixed">
+    <parent link="world"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 0.65" rpy="0 0 0"/>
+  </joint>
+
+  <gazebo reference="world_to_base_fixed">
+    <preserveFixedJoint>true</preserveFixedJoint>
+  </gazebo>
+
+  <!-- Demo mode: no gravity on links; legs move only via joint trajectory -->
   <gazebo reference="base_link">
     <gravity>false</gravity>
   </gazebo>
+  <gazebo reference="RightHipYaw_Link"><gravity>false</gravity></gazebo>
+  <gazebo reference="RightHipRoll_Link"><gravity>false</gravity></gazebo>
+  <gazebo reference="RightHipPitch_Link"><gravity>false</gravity></gazebo>
+  <gazebo reference="RightKneePitch_Link"><gravity>false</gravity></gazebo>
+  <gazebo reference="RightAnklePitch_Link"><gravity>false</gravity></gazebo>
+  <gazebo reference="LeftHipYaw_Link"><gravity>false</gravity></gazebo>
+  <gazebo reference="LeftHipRoll_Link"><gravity>false</gravity></gazebo>
+  <gazebo reference="LeftHipPitch_Link"><gravity>false</gravity></gazebo>
+  <gazebo reference="LeftKneePitch_Link"><gravity>false</gravity></gazebo>
+  <gazebo reference="LeftAnklePitch_Link"><gravity>false</gravity></gazebo>
 
-  <!-- Standing pose: feet near ground when base_link is spawned at z=0.45 -->
+  <!-- Symmetric standing pose: both feet at the same height -->
+  <gazebo reference="LeftHipYaw">
+    <initialPosition>0.0</initialPosition>
+  </gazebo>
+  <gazebo reference="LeftHipRoll">
+    <initialPosition>0.0</initialPosition>
+  </gazebo>
   <gazebo reference="LeftHipPitch">
-    <initialPosition>0.4</initialPosition>
+    <initialPosition>0.0155</initialPosition>
   </gazebo>
   <gazebo reference="LeftKneePitch">
-    <initialPosition>-0.8</initialPosition>
+    <initialPosition>-0.0268</initialPosition>
   </gazebo>
   <gazebo reference="LeftAnklePitch">
     <initialPosition>0.4</initialPosition>
   </gazebo>
+  <gazebo reference="RightHipYaw">
+    <initialPosition>0.0</initialPosition>
+  </gazebo>
+  <gazebo reference="RightHipRoll">
+    <initialPosition>0.0</initialPosition>
+  </gazebo>
   <gazebo reference="RightHipPitch">
-    <initialPosition>0.4</initialPosition>
+    <initialPosition>-0.0155</initialPosition>
   </gazebo>
   <gazebo reference="RightKneePitch">
-    <initialPosition>-0.8</initialPosition>
+    <initialPosition>0.0268</initialPosition>
   </gazebo>
   <gazebo reference="RightAnklePitch">
     <initialPosition>0.4</initialPosition>

@@ -65,12 +65,13 @@ ros2 topic hz /joint_trajectory_controller/joint_trajectory
 | `spawn_entity.py: error: unrecognized arguments: -J ...` | 旧版 launch 文件 | `colcon build --symlink-install && source install/setup.bash` |
 | `ModuleNotFoundError: biped2_kinematics` | Python 包未正确安装 | `colcon build --symlink-install --packages-select biped2_kinematics` |
 | `gzserver ... exit code 255` / `Address already in use` | 已有 Gazebo 在运行 | `./scripts/stop_gazebo.sh` 后重试 |
-| `Could not contact service /controller_manager/...` | 已改用 Gazebo 关节插件，不再使用 controller_manager；请重新 `colcon build` |
+| `Plugin needs a reference link [] as frame_id` | 残留旧版 `foot_lift_demo` 进程在发空轨迹 | `./scripts/stop_gazebo.sh` 后重启；launch 启动前会自动清理 |
+| `Could not contact service /controller_manager/...` | 已改用 Gazebo 关节插件，不再使用 controller_manager | 重新 `colcon build` 并确保未加载旧 launch |
 
 `colcon build` 开头的 `packaging>=22` 警告可忽略，不影响编译。
 
 ## Notes
 
-- 机器人 spawn 高度 z=0.65 m，`base_link` 关闭重力以保持 demo 稳定。
+- 机器人通过 `world → base_link` 固定关节悬停在 z=0.65 m，各连杆关闭重力，仅由关节轨迹驱动摆腿 demo。
 - IK 仅调整每条腿的 `HipPitch / KneePitch / AnklePitch`。
 - Demo 周期：stand -> 抬右脚 -> stand -> 抬左脚。

@@ -38,17 +38,12 @@ def generate_launch_description():
         DeclareLaunchArgument('gui', default_value='true'),
     ]
 
-    # Kill stale Gazebo processes (exit 255 / Address already in use).
+    stop_script = os.path.abspath(
+        os.path.join(pkg_desc, '..', '..', '..', '..', 'scripts', 'stop_gazebo.sh')
+    )
+
     cleanup_gazebo = ExecuteProcess(
-        cmd=[
-            'bash',
-            '-c',
-            'pkill -x gzserver 2>/dev/null || true; '
-            'pkill -x gzclient 2>/dev/null || true; '
-            'sleep 1; '
-            'pkill -9 -x gzserver 2>/dev/null || true; '
-            'pkill -9 -x gzclient 2>/dev/null || true',
-        ],
+        cmd=['bash', stop_script],
         output='screen',
     )
 
@@ -87,7 +82,7 @@ def generate_launch_description():
             '-y',
             '0.0',
             '-z',
-            '0.45',
+            '0.0',
             '-timeout',
             '120',
         ],
@@ -105,7 +100,13 @@ def generate_launch_description():
         package='biped2_kinematics',
         executable='foot_lift_demo',
         output='screen',
-        parameters=[{'use_sim_time': LaunchConfiguration('use_sim_time')}],
+        parameters=[
+            {
+                'use_sim_time': LaunchConfiguration('use_sim_time'),
+                'trajectory_frame_id': 'world',
+                'lift_height': 0.10,
+            }
+        ],
     )
 
     return LaunchDescription(
