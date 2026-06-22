@@ -22,7 +22,7 @@ JOINT_NAMES: List[str] = [
     'RightAnklePitch',
 ]
 
-STAND_FOOT_Z = 0.28
+STAND_FOOT_Z = 0.0
 # Joint deltas at full lift (~12 cm foot clearance); scaled by lift_height / LIFT_REFERENCE_HEIGHT.
 LIFT_REFERENCE_HEIGHT = 0.12
 LIFT_JOINT_DELTAS: Dict[str, Dict[str, float]] = {
@@ -44,18 +44,24 @@ DEFAULT_JOINT_ANGLES: Dict[str, float] = {
     'LeftHipRoll': 0.0,
     'LeftHipPitch': 0.0155,
     'LeftKneePitch': -0.0268,
-    'LeftAnklePitch': 0.4,
+    'LeftAnklePitch': 0.0,
     'RightHipYaw': 0.0,
     'RightHipRoll': 0.0,
     'RightHipPitch': -0.0155,
     'RightKneePitch': 0.0268,
-    'RightAnklePitch': 0.4,
+    'RightAnklePitch': 0.0,
 }
 
 LEG_IK_JOINTS: Dict[str, List[str]] = {
     'left': ['LeftHipPitch', 'LeftKneePitch', 'LeftAnklePitch'],
     'right': ['RightHipPitch', 'RightKneePitch', 'RightAnklePitch'],
 }
+
+SWING_MIRROR_JOINTS: List[Tuple[str, str]] = [
+    ('RightHipPitch', 'LeftHipPitch'),
+    ('RightKneePitch', 'LeftKneePitch'),
+    ('RightAnklePitch', 'LeftAnklePitch'),
+]
 
 FOOT_FRAME_NAMES: Dict[str, str] = {
     'left': 'LeftAnklePitch_Link',
@@ -113,26 +119,80 @@ class Biped2Kinematics:
 
     def compute_symmetric_stand_configuration(self, foot_z: float = STAND_FOOT_Z) -> np.ndarray:
         q = self.default_configuration()
+        flat_rotations = self.compute_flat_foot_rotations(q)
         left_pose, right_pose = self.forward_kinematics(q)
         foot_y = 0.5 * (abs(left_pose.translation[1]) + abs(right_pose.translation[1]))
         foot_x = 0.5 * (left_pose.translation[0] + right_pose.translation[0])
 
-        for _ in range(20):
+        for _ in range(30):
             for leg, y_sign in (('right', 1.0), ('left', -1.0)):
-                target = pin.SE3(np.eye(3), np.array([foot_x, y_sign * foot_y, foot_z]))
+                target = pin.SE3(
+                    flat_rotations[leg],
+                    np.array([foot_x, y_sign * foot_y, foot_z]),
+                )
                 q, _, _ = self.inverse_kinematics(
                     leg,
                     target,
                     q,
-                    position_only=True,
+                    position_only=False,
                 )
         return q
+
+    def compute_flat_foot_rotations(self, q: np.ndarray | None = None) -> Dict[str, np.ndarray]:
+        q_ref = self.default_configuration() if q is None else q.copy()
+        q_ref[self.joint_name_to_q_idx['LeftAnklePitch']] = 0.0
+        q_ref[self.joint_name_to_q_idx['RightAnklePitch']] = 0.0
+        return {
+            'left': self.foot_pose(q_ref, 'left').rotation.copy(),
+            'right': self.foot_pose(q_ref, 'right').rotation.copy(),
+        }
+
+    def flat_sole_score(self, leg: str, rotation: np.ndarray) -> float:
+        world_up = np.array([0.0, 0.0, 1.0])
+        if leg == 'left':
+            return float((-rotation[:, 1]) @ world_up)
+        return float(rotation[:, 1] @ world_up)
+
+    def adjust_ankle_for_flat_sole(self, q: np.ndarray, leg: str) -> np.ndarray:
+        ankle_name = 'LeftAnklePitch' if leg == 'left' else 'RightAnklePitch'
+        idx_q = self.joint_name_to_q_idx[ankle_name]
+        lower = self.model.lowerPositionLimit[idx_q]
+        upper = self.model.upperPositionLimit[idx_q]
+
+        best_q = q.copy()
+        best_score = self.flat_sole_score(leg, self.foot_pose(q, leg).rotation)
+        for ankle_angle in np.linspace(lower, upper, 81):
+            candidate = q.copy()
+            candidate[idx_q] = ankle_angle
+            score = self.flat_sole_score(leg, self.foot_pose(candidate, leg).rotation)
+            if score > best_score:
+                best_score = score
+                best_q = candidate
+        return best_q
 
     def apply_lift_joint_deltas(self, q: np.ndarray, leg: str, scale: float) -> np.ndarray:
         q_lift = q.copy()
         for joint_name, delta in LIFT_JOINT_DELTAS[leg].items():
             q_lift[self.joint_name_to_q_idx[joint_name]] += delta * scale
         return self._clip_configuration(q_lift)
+
+    def mirror_right_swing_to_left(self, stand_q: np.ndarray, right_swing_q: np.ndarray) -> np.ndarray:
+        """Map a right-leg swing configuration to the left leg in the sagittal plane."""
+        q_left = stand_q.copy()
+        for right_name, left_name in SWING_MIRROR_JOINTS:
+            right_idx = self.joint_name_to_q_idx[right_name]
+            left_idx = self.joint_name_to_q_idx[left_name]
+            delta = right_swing_q[right_idx] - stand_q[right_idx]
+            q_left[left_idx] = stand_q[left_idx] - delta
+        return self._clip_configuration(q_left)
+
+    def lock_leg_yaw_roll(self, q: np.ndarray, leg: str, stand_q: np.ndarray) -> np.ndarray:
+        q_locked = q.copy()
+        prefix = 'Left' if leg == 'left' else 'Right'
+        for joint_name in (f'{prefix}HipYaw', f'{prefix}HipRoll'):
+            idx = self.joint_name_to_q_idx[joint_name]
+            q_locked[idx] = stand_q[idx]
+        return q_locked
 
     def configuration_from_joint_dict(self, joint_positions: Dict[str, float]) -> np.ndarray:
         q = self.default_configuration()

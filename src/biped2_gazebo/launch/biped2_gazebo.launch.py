@@ -105,6 +105,8 @@ def generate_launch_description():
                 'use_sim_time': LaunchConfiguration('use_sim_time'),
                 'trajectory_frame_id': 'world',
                 'lift_height': 0.10,
+                'step_length': 0.08,
+                'stand_foot_z': 0.0,
             }
         ],
     )
