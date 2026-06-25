@@ -17,7 +17,7 @@ biped2_ros/
 
 | 包 | 作用 |
 |----|------|
-| `biped2_description` | 提供 biped2 URDF；构建时将 mesh 转为 `file://` 绝对路径供 Gazebo 加载；内置关节状态发布与轨迹跟踪插件 |
+| `biped2_description` | 提供 biped2 URDF 与 mesh（已随仓库提交，无需外部 `legged_gym`）；构建时将 mesh 转为指向 `install/` 的 `file://` 路径供 Gazebo 加载 |
 | `biped2_kinematics` | Pinocchio FK/IK；`foot_lift_demo` 生成摆线足端轨迹并求解关节角；`foot_fk_publisher` 发布足端位姿 |
 | `biped2_gazebo` | 启动 Gazebo、spawn 机器人、拉起 demo 节点 |
 
@@ -128,7 +128,7 @@ ros2 run biped2_kinematics foot_lift_demo --ros-args \
 | `gzserver exit 255` / 端口占用 | `./scripts/stop_gazebo.sh` 后重试 |
 | Gazebo 只有地面、没有机器人 | 等待约 7 s；确认已 `source install/setup.bash` |
 | `Package 'biped2_gazebo' not found` | 在工作空间执行 `source install/setup.bash` |
-| 模型不显示 | `colcon build --packages-select biped2_description` 重建 mesh 路径 |
+| 模型不显示 | 在新机器上必须 `colcon build` 后 `source install/setup.bash`（URDF 里的 mesh 路径指向本机 `install/`）；确认 `install/biped2_description/share/biped2_description/meshes/*.STL` 存在 |
 | `frame_id` 报错 | `./scripts/stop_gazebo.sh` 清理残留 `foot_lift_demo` 进程 |
 
 `colcon build` 时 `packaging>=22` 警告可忽略。

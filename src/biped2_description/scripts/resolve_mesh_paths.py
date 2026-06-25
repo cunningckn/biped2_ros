@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Replace package:// mesh URIs with absolute file:// paths for Gazebo."""
+"""Replace package:// mesh URIs with install-space file:// paths for Gazebo.
+
+Gazebo Classic cannot resolve package:// URIs. Paths must point at the
+installed share/biped2_description/meshes directory so clones work on any
+machine after colcon build + source install/setup.bash.
+"""
 
 from __future__ import annotations
 
